@@ -43,6 +43,11 @@ from email.mime.multipart import MIMEMultipart
 
 from email.encoders import _bencode
 
+try:
+    from email.policy import Compat32
+except ImportError:
+    Compat32 = None
+
 from .exceptions import (
     BadHeaders,
     InvalidMessage,
@@ -491,6 +496,9 @@ def to_message(base):
     for part in base.parts:
         sub = to_message(part)
         out.attach(sub)
+
+    if not PY2:
+        out.policy = Compat32(linesep="\r\n")
 
     return out
 
